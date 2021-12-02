@@ -1,22 +1,13 @@
 fun main() {
-    fun part1Internal(input: List<Int>): Int {
-        return input.foldIndexed(0) { index, acc, value ->
-            if (index == 0 || value <= input[index -1]) acc
-            else acc + 1
-        }
-    }
 
     fun part1(input: List<Int>): Int {
-        return part1Internal(input)
+        return input.windowed(2)
+            .count { (a, b) -> a < b }
     }
 
     fun part2(input: List<Int>): Int {
-        val newValues = input.mapIndexed { index: Int, value: Int ->
-            if (index + 2 >= input.size) null
-            else value + input[index + 1] + input[index + 2]
-        }.filterNotNull()
-
-        return part1Internal(newValues)
+        return input.windowed(4)
+            .count { it[0] < it[3] }
     }
 
     // test if implementation meets criteria from the description, like:
