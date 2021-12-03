@@ -1,38 +1,38 @@
 fun main() {
     fun part1(input: List<String>): Int {
-        var horizontal = 0
+        var horizontalPosition = 0
         var depth = 0
 
         input.map { it.split(" ") }
-            .forEach {
-                when(it[0]) {
-                    "forward" -> horizontal += it[1].toInt()
-                    "down" -> depth += it[1].toInt()
-                    "up" -> depth -= it[1].toInt()
+            .forEach { (direction, amountString) ->
+                when(direction) {
+                    "forward" -> horizontalPosition += amountString.toInt()
+                    "down" -> depth += amountString.toInt()
+                    "up" -> depth -= amountString.toInt()
                 }
             }
 
-        return horizontal * depth
+        return horizontalPosition * depth
     }
 
     fun part2(input: List<String>): Int {
-        var horizontal = 0
+        var horizontalPosition = 0
         var depth = 0
         var aim = 0
 
         input.map { it.split(" ") }
-            .forEach {
-            when(it[0]) {
+            .forEach { (direction, amountString) ->
+            when(direction) {
                 "forward" -> {
-                    horizontal += it[1].toInt()
-                    depth += it[1].toInt() * aim
+                    horizontalPosition += amountString.toInt()
+                    depth += amountString.toInt() * aim
                 }
-                "down" -> aim += it[1].toInt()
-                "up" -> aim -= it[1].toInt()
+                "down" -> aim += amountString.toInt()
+                "up" -> aim -= amountString.toInt()
             }
         }
 
-        return horizontal * depth
+        return horizontalPosition * depth
     }
 
     // test if implementation meets criteria from the description, like:
