@@ -7,10 +7,9 @@ fun main() {
         return input.size
     }
 
-    // test if implementation meets criteria from the description, like:
     val testInput = readInput("DayXX_test")
-    check(part1(testInput) == 0)
-    check(part2(testInput) == 0)
+    checkPart(0, part1(testInput), "Part1 Example")
+    checkPart(0, part2(testInput), "Part2 Example")
 
     val input = readInput("DayXX")
     println(part1(input))
