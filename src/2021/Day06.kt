@@ -1,3 +1,8 @@
+package `2021`
+
+import checkPart
+import readInput
+
 fun main() {
     fun simulateDays(days: Int, fishiesPerDay: LongArray): Long {
         repeat(days) {

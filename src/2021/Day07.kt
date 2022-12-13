@@ -1,3 +1,8 @@
+package `2021`
+
+import checkPart
+import readInput
+
 fun main() {
     fun part1(input: List<Int>): Int {
         val positionsSum = input.sum()

@@ -1,3 +1,7 @@
+package `2021`
+
+import readInput
+
 fun main() {
     fun part1(input: List<String>): Int {
         val (numbers, boards) = extractNumbersAndBoardsFromInput(input)

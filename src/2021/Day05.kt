@@ -1,3 +1,7 @@
+package `2021`
+
+import readInput
+
 fun main() {
     fun partX(input: List<String>, isPart2: Boolean): Int {
         val pointPairs = input.map { line ->
