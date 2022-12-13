@@ -89,12 +89,12 @@ fun extractNumbersAndBoardsFromInput(input: List<String>): Pair<List<Int>, List<
     val numbers = input[0].split(",").map { it.toInt() }
 
     val boards = input.subList(1, input.size)
-        .windowed(6, 6)
+        .chunked(6)
         .map { it.subList(1, it.size) }
         .map { list ->
             list.map { lineString ->
                 lineString.trim()
-                    .replace(" +".toRegex(), " ").split(" ")
+                    .split("\\W+".toRegex())
                     .map { it.toInt() }
                     .toMutableList()
             }
