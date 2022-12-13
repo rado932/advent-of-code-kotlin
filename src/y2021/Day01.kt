@@ -1,6 +1,4 @@
-package `2022`
-
-import readInput
+package y2021
 
 fun main() {
 

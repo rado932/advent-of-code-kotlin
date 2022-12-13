@@ -1,7 +1,4 @@
-package `2021`
-
-import checkPart
-import readInput
+package y2021
 
 fun main() {
     fun simulateDays(days: Int, fishiesPerDay: LongArray): Long {

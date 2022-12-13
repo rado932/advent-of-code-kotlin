@@ -1,3 +1,6 @@
+import y2021.checkPart
+import y2021.readInput
+
 fun main() {
     fun part1(input: List<String>): Int {
         return input.size

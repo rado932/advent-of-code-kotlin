@@ -1,6 +1,4 @@
-package `2021`
-
-import readInput
+package y2021
 
 fun main() {
     fun partX(input: List<String>, isPart2: Boolean): Int {
