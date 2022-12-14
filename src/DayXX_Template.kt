@@ -1,20 +1,20 @@
-import y2021.checkPart
-import y2021.readInput
+import java.io.File
+
+private const val inputPrefix = "src/y2022/DayXX"
 
 fun main() {
-    fun part1(input: List<String>): Int {
-        return input.size
-    }
 
-    fun part2(input: List<String>): Int {
-        return input.size
-    }
+    fun part1(input: List<String>): Int = 0
 
-    val testInput = readInput("DayXX_test")
-    checkPart(0, part1(testInput), "Part1 Example")
-    checkPart(0, part2(testInput), "Part2 Example")
+    fun part2(input: List<String>): Int = 0
 
-    val input = readInput("DayXX")
+    val testInput = File("${inputPrefix}_test.txt").readLines()
+
+    val input = File("$inputPrefix.txt").readLines()
+
+    check(part1(testInput) == 0)
     println(part1(input))
+
+    check(part2(testInput) == 0)
     println(part2(input))
 }
