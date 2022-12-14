@@ -12,9 +12,9 @@ fun main() {
 
     val input = File("$inputPrefix.txt").readLines()
 
-    check(part1(testInput) == 0)
-    println(part1(input))
+//    check(part1(testInput) == 0)
+//    println(part1(input))
 
-    check(part2(testInput) == 0)
-    println(part2(input))
+//    check(part2(testInput) == 0)
+//    println(part2(input))
 }
