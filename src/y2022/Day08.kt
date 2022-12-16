@@ -20,6 +20,11 @@ fun main() {
         }
     }
 
+    infix fun Int.downUntil(to: Int): IntProgression {
+        if (to >= Int.MAX_VALUE) return IntRange.EMPTY
+        return this downTo (to + 1)
+    }
+
     fun part1(input: List<MutableList<Tree>>): Int {
         fun checkVisibility(
             range: IntProgression,
@@ -46,10 +51,10 @@ fun main() {
             input[i][rowsLastIndex].markAsVisible()
 
             if (i != 0 && i != columnsLastIndex) {
-                checkVisibility(0..rowsLastIndex) { j ->
+                checkVisibility(0 until rowsLastIndex) { j ->
                     input[i][j]
                 }
-                checkVisibility(rowsLastIndex downTo 0) { j ->
+                checkVisibility(rowsLastIndex downUntil 0) { j ->
                     input[i][j]
                 }
             }
@@ -60,10 +65,10 @@ fun main() {
             input[columnsLastIndex][i].markAsVisible()
 
             if (i != 0 && i != rowsLastIndex) {
-                checkVisibility(0..columnsLastIndex) { j ->
+                checkVisibility(0 until columnsLastIndex) { j ->
                     input[j][i]
                 }
-                checkVisibility(columnsLastIndex downTo 0) { j ->
+                checkVisibility(columnsLastIndex downUntil 0) { j ->
                     input[j][i]
                 }
             }
