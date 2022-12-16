@@ -4,29 +4,100 @@ import java.io.File
 
 private const val inputPrefix = "src/y2022/Day08"
 
-fun main() {
+class Tree(
+    private val forest: Forest,
+    val height: Int,
+    val i: Int,
+    val j: Int
+) {
+    private var _isVisible: Boolean = false
+    val isVisible: Boolean
+        get() = _isVisible
 
-    class Tree(val height: Int) {
-        private var _isVisible: Boolean = false
-        val isVisible: Boolean
-            get() = _isVisible
+    private var _scenicScore: Int = 0
+    val scenicScore: Int
+        get() = _scenicScore
 
-        private var _scenicScore: Int = 0
-        val scenicScore: Int
-            get() = _scenicScore
+    fun markAsVisible() {
+        _isVisible = true
+    }
 
-        fun markAsVisible() {
-            _isVisible = true
+    // part 2
+    fun updateScenicScore() {
+        _scenicScore = tallerTreesUp(height) * tallerTreesDown(height) *
+            tallerTreesLeft(height) * tallerTreesRight(height)
+    }
+
+    fun tallerTreesUp(requesterHeight: Int): Int = calculateSmallerTrees(
+        requesterHeight,
+        { forest.getUpSibling(this) },
+        { it.tallerTreesUp(requesterHeight) },
+    )
+
+    fun tallerTreesLeft(requesterHeight: Int): Int = calculateSmallerTrees(
+        requesterHeight,
+        { forest.getLeftSibling(this) },
+        { it.tallerTreesLeft(requesterHeight) },
+    )
+
+    fun tallerTreesDown(requesterHeight: Int): Int = calculateSmallerTrees(
+        requesterHeight,
+        { forest.getDownSibling(this) },
+        { it.tallerTreesDown(requesterHeight) },
+    )
+
+    fun tallerTreesRight(requesterHeight: Int): Int = calculateSmallerTrees(
+        requesterHeight,
+        { forest.getRightSibling(this) },
+        { it.tallerTreesRight(requesterHeight) },
+    )
+
+    private fun calculateSmallerTrees(
+        requesterHeight: Int,
+        getSibling: () -> Tree?,
+        getSiblingSmallerTrees: (sibling: Tree) -> Int,
+    ): Int {
+        val sibling = getSibling() ?: return 0
+        if (requesterHeight <= sibling.height) return 1
+        return 1 + getSiblingSmallerTrees(sibling)
+    }
+}
+
+class Forest(input: List<List<Char>>) {
+    private val forest: List<List<Tree>>
+
+    val rowsLastIndex: Int
+    val columnsLastIndex: Int
+
+    val maxScenicScore: Int
+        get() = forest.maxOf { line ->
+            line.maxOf { it.scenicScore }
         }
+
+    val visibleTrees: Int
+        get() = forest.sumOf { it.count { it.isVisible } }
+
+    init {
+        columnsLastIndex = input.lastIndex
+        rowsLastIndex = input[0].lastIndex
+
+        forest = input.mapIndexed { i, list ->
+            list.mapIndexed { j, char ->
+                Tree(this, char.digitToInt(), i, j)
+            }
+        }
+
+        updateVisibility()
+        updateScenicScores()
     }
 
-    infix fun Int.downUntil(to: Int): IntProgression {
-        if (to >= Int.MAX_VALUE) return IntRange.EMPTY
-        return this downTo (to + 1)
-    }
+    private fun updateVisibility() {
+        infix fun Int.downUntil(to: Int): IntProgression {
+            if (to >= Int.MAX_VALUE) return IntRange.EMPTY
+            return this downTo (to + 1)
+        }
 
-    fun part1(input: List<MutableList<Tree>>): Int {
-        fun checkVisibility(
+        fun updateVisibilityInternal(
             range: IntProgression,
             maxHeight: Int = 9,
             getElement: (Int) -> Tree,
@@ -43,56 +114,84 @@ fun main() {
             }
         }
 
-        val rowsLastIndex = input[0].lastIndex
-        val columnsLastIndex = input.lastIndex
-
         for (i in 0..columnsLastIndex) {
-            input[i][0].markAsVisible()
-            input[i][rowsLastIndex].markAsVisible()
+            forest[i][0].markAsVisible()
+            forest[i][rowsLastIndex].markAsVisible()
 
             if (i != 0 && i != columnsLastIndex) {
-                checkVisibility(0 until rowsLastIndex) { j ->
-                    input[i][j]
+                updateVisibilityInternal(0 until rowsLastIndex) { j ->
+                    forest[i][j]
                 }
-                checkVisibility(rowsLastIndex downUntil 0) { j ->
-                    input[i][j]
+                updateVisibilityInternal(rowsLastIndex downUntil 0) { j ->
+                    forest[i][j]
                 }
             }
         }
 
         for (i in 0..rowsLastIndex) {
-            input[0][i].markAsVisible()
-            input[columnsLastIndex][i].markAsVisible()
+            forest[0][i].markAsVisible()
+            forest[columnsLastIndex][i].markAsVisible()
 
             if (i != 0 && i != rowsLastIndex) {
-                checkVisibility(0 until columnsLastIndex) { j ->
-                    input[j][i]
+                updateVisibilityInternal(0 until columnsLastIndex) { j ->
+                    forest[j][i]
                 }
-                checkVisibility(columnsLastIndex downUntil 0) { j ->
-                    input[j][i]
+                updateVisibilityInternal(columnsLastIndex downUntil 0) { j ->
+                    forest[j][i]
                 }
             }
         }
-
-        return input.sumOf { it.count { it.isVisible } }
     }
 
-    fun part2(input: List<MutableList<Tree>>): Int {
-
-        return input.maxOf { it.maxOf { it.scenicScore } }
+    private fun updateScenicScores() {
+        for (i in 1 until columnsLastIndex) {
+            for (j in 1 until rowsLastIndex) {
+                forest[i][j].updateScenicScore()
+            }
+        }
     }
 
-    val testInput = File("${inputPrefix}_test.txt").readLines().map {
-        it.toList().map { Tree(it.digitToInt()) }.toMutableList()
+    fun getUpSibling(tree: Tree): Tree? = try {
+        forest[tree.i - 1][tree.j]
+    } catch (ex: Exception) {
+        null
     }
 
-    val input = File("$inputPrefix.txt").readLines().map {
-        it.toList().map { Tree(it.digitToInt()) }.toMutableList()
+    fun getLeftSibling(tree: Tree): Tree? = try {
+        forest[tree.i][tree.j - 1]
+    } catch (ex: Exception) {
+        null
     }
 
-//    check(part1(testInput) == 21)
-    println(part1(input))
+    fun getDownSibling(tree: Tree): Tree? = try {
+        forest[tree.i + 1][tree.j]
+    } catch (ex: Exception) {
+        null
+    }
 
-    check(part2(testInput) == 8)
-//    println(part2(input))
+    fun getRightSibling(tree: Tree): Tree? = try {
+        forest[tree.i][tree.j + 1]
+    } catch (ex: Exception) {
+        null
+    }
+}
+
+fun main() {
+
+    fun part1(forest: Forest): Int = forest.visibleTrees
+
+    fun part2(forest: Forest): Int = forest.maxScenicScore
+
+
+    val testInput = File("${inputPrefix}_test.txt").readLines().map { it.toList() }
+    val forestTest = Forest(testInput)
+
+    val input = File("$inputPrefix.txt").readLines().map { it.toList() }
+    val forest = Forest(input)
+
+    check(part1(forestTest) == 21)
+    println(part1(forest))
+//
+    check(part2(forestTest) == 8)
+    println(part2(forest))
 }
