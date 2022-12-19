@@ -28,25 +28,25 @@ class Tree(
             tallerTreesLeft(height) * tallerTreesRight(height)
     }
 
-    fun tallerTreesUp(requesterHeight: Int): Int = calculateSmallerTrees(
+    private fun tallerTreesUp(requesterHeight: Int): Int = calculateSmallerTrees(
         requesterHeight,
         { forest.getUpSibling(this) },
         { it.tallerTreesUp(requesterHeight) },
     )
 
-    fun tallerTreesLeft(requesterHeight: Int): Int = calculateSmallerTrees(
+    private fun tallerTreesLeft(requesterHeight: Int): Int = calculateSmallerTrees(
         requesterHeight,
         { forest.getLeftSibling(this) },
         { it.tallerTreesLeft(requesterHeight) },
     )
 
-    fun tallerTreesDown(requesterHeight: Int): Int = calculateSmallerTrees(
+    private fun tallerTreesDown(requesterHeight: Int): Int = calculateSmallerTrees(
         requesterHeight,
         { forest.getDownSibling(this) },
         { it.tallerTreesDown(requesterHeight) },
     )
 
-    fun tallerTreesRight(requesterHeight: Int): Int = calculateSmallerTrees(
+    private fun tallerTreesRight(requesterHeight: Int): Int = calculateSmallerTrees(
         requesterHeight,
         { forest.getRightSibling(this) },
         { it.tallerTreesRight(requesterHeight) },
@@ -66,8 +66,8 @@ class Tree(
 class Forest(input: List<List<Char>>) {
     private val forest: List<List<Tree>>
 
-    val rowsLastIndex: Int
-    val columnsLastIndex: Int
+    private val rowsLastIndex: Int
+    private val columnsLastIndex: Int
 
     val maxScenicScore: Int
         get() = forest.maxOf { line ->
@@ -191,7 +191,7 @@ fun main() {
 
     check(part1(forestTest) == 21)
     println(part1(forest))
-//
+
     check(part2(forestTest) == 8)
     println(part2(forest))
 }
