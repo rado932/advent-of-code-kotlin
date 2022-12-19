@@ -6,49 +6,62 @@ private const val inputPrefix = "src/y2022/Day10"
 
 fun main() {
 
-    fun part1(input: List<String>): Int {
-        fun getBreakPoint(cycle: Int): Int =
-            if (cycle == 20 || (cycle - 20) % 40 == 0) cycle
-            else 0
+    fun getBreakPoint(cycle: Int): Int =
+        if (cycle == 20 || (cycle - 20) % 40 == 0) cycle
+        else 0
 
-        var x = 1
-        var cycle = 1
+    fun part1(input: List<String>): Int = input.foldIndexed(1 to 0) { n, (x, sum), command ->
+        when {
+            command.startsWith("addx ") -> {
+                val breakPoint = getBreakPoint(n + 1)
+                val newX = x + command.substringAfter("addx ").toInt()
+                newX to sum + (breakPoint * x)
+            }
 
-        return input.sumOf {
-            when {
-                it.startsWith("addx ") -> {
-                    cycle += 1
-                    val breakPoint2 = getBreakPoint(cycle)
-
-                    x += it.substringAfter("addx ").toInt()
-                    breakPoint2 * x
-                }
-
-                else -> {
-                    cycle += 1
-                    val breakPoint = getBreakPoint(cycle)
-                    breakPoint * x
-                }
+            else -> {
+                val breakPoint = getBreakPoint(n + 1)
+                x to sum + (breakPoint * x)
             }
         }
-    }
+    }.second
 
-    fun part2(input: List<String>): Int {
-        return 0
-    }
+    fun part2(input: List<String>): String = input.foldIndexed(1 to "") { n, (x, acc), command ->
+        val cycle = n % 40
 
-    fun parseInput(input: List<String>): List<String> = input.flatMap {
+        val newChar = if ((cycle - x) in -1..1) "#"
+        else "."
+
+        val newX = if (command.startsWith("addx ")) {
+            x + command.substringAfter("addx ").toInt()
+        } else x
+
+        newX to acc + newChar
+    }.second
+
+    fun List<String>.parseInput(): List<String> = flatMap {
         if (it == "noop") listOf(it)
         else listOf("noop", it)
     }
 
-    val testInput = File("${inputPrefix}_test.txt").readLines()
+    fun String.formatOutput() = toCharArray().toList().chunked(40).forEach {
+        println(it.joinToString(""))
+    }
 
-    val input = File("$inputPrefix.txt").readLines()
+    val testInput = File("${inputPrefix}_test.txt").readLines().parseInput()
+    val input = File("$inputPrefix.txt").readLines().parseInput()
 
-    check(part1(parseInput(testInput)) == 13140)
-    println(part1(parseInput(input)))
+    check(part1(testInput) == 13140)
+    println("Part 1 Output")
+    println(part1(input))
 
-//    check(part2(testInput) == 0)
-//    println(part2(input))
+    val part2TestOutput = part2(testInput)
+    println("Part 2 Test Output")
+    part2TestOutput.formatOutput()
+
+    val expectedTestOutput =
+        "##..##..##..##..##..##..##..##..##..##..###...###...###...###...###...###...###.####....####....####....####....####....#####.....#####.....#####.....#####.....######......######......######......###########.......#######.......#######....."
+    check(part2TestOutput == expectedTestOutput)
+
+    println("Part 2 Output")
+    part2(input).formatOutput()
 }
