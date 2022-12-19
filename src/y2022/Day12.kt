@@ -17,23 +17,25 @@ object Day12 {
             canMove: (Int, Int) -> Boolean
         ): Int {
             val seen = mutableSetOf<Point2D>()
-            val queue = PriorityQueue<PathCost>().apply { add(PathCost(begin, 0)) }
+            val queue = LinkedList<Pair<Point2D, Int>>().apply { add(begin to 0) }
 
             while (queue.isNotEmpty()) {
-                val currentPoint = queue.poll()
+                val (currentPoint, cost) = queue.poll()
 
-                if (currentPoint.point !in seen) {
-                    seen += currentPoint.point
+                if (currentPoint !in seen) {
+                    seen += currentPoint
 
-                    val neighbors = currentPoint.point.cardinalNeighbors()
-                        .filter { it in elevations }
+                    val neighbors = currentPoint.cardinalNeighbors()
                         .filter { neighbourPoint ->
-                            canMove(elevations[currentPoint.point]!!, elevations[neighbourPoint]!!)
+                            neighbourPoint in elevations &&
+                            canMove(elevations[currentPoint]!!, elevations[neighbourPoint]!!)
                         }
-                    if (neighbors.any { isGoal(it) }) return currentPoint.cost + 1
-                    queue.addAll(neighbors.map { neighbourPoint -> PathCost(neighbourPoint, currentPoint.cost + 1) })
+
+                    if (neighbors.any { isGoal(it) }) return cost + 1
+                    queue.addAll(neighbors.map { neighbourPoint -> neighbourPoint to cost + 1 })
                 }
             }
+
             throw IllegalStateException("No valid path from $start to $end")
         }
     }
@@ -44,13 +46,8 @@ object Day12 {
                 copy(x = x - 1),
                 copy(x = x + 1),
                 copy(y = y - 1),
-                copy(y = y + 1)
+                copy(y = y + 1),
             )
-    }
-
-    private data class PathCost(val point: Point2D, val cost: Int) : Comparable<PathCost> {
-        override fun compareTo(other: PathCost): Int =
-            this.cost.compareTo(other.cost)
     }
 
     fun List<String>.parseInput(): HeightMap {
