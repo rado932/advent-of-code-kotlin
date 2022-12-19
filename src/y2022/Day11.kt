@@ -10,19 +10,20 @@ typealias ToMonkey = Int
 fun main() {
 
     class Monkey(
-        private val items: PriorityQueue<Int>,
-        private val inspectAnItem: (Int) -> Int, // worry -> new worry
-        private val testAnItem: (Int) -> ToMonkey // worry -> monkey
+        private val items: PriorityQueue<Long>,
+        private val inspectAnItem: (Long) -> Long,
+        val testNumber: Long,
+        private val testAnItem: (Long, Long) -> ToMonkey // worry -> monkey
     ) {
         val inspectedItems
             get() = _inspectedItems
-        private var _inspectedItems = 0
+        private var _inspectedItems = 0L
 
-        fun add(worry: Int) = items.add(worry)
+        fun add(worry: Long) = items.add(worry)
 
         fun hasItems() = items.isNotEmpty()
 
-        fun processNextItem(): Pair<ToMonkey, Int> {
+        fun processNextItem(getBored: (Long) -> Long): Pair<ToMonkey, Long> {
             _inspectedItems += 1
 
             val item = items.poll()
@@ -30,17 +31,17 @@ fun main() {
             var worryLevel = inspectAnItem(item)
             worryLevel = getBored(worryLevel)
 
-            return testAnItem(worryLevel) to worryLevel
+            return testAnItem(worryLevel, testNumber) to worryLevel
         }
-
-        private fun getBored(worryLevel: Int) = worryLevel / 3
     }
 
-    fun part1(monkeys: List<Monkey>): Int {
+    fun part1(monkeys: List<Monkey>): Long {
+        val getBored: (Long) -> Long = { worry -> worry / 3 }
+
         repeat(20) {
             monkeys.forEach {
                 while(it.hasItems()) {
-                    val (toMonkey, worry) = it.processNextItem()
+                    val (toMonkey, worry) = it.processNextItem(getBored)
                     monkeys[toMonkey].add(worry)
                 }
             }
@@ -49,22 +50,37 @@ fun main() {
         return monkeys.map { it.inspectedItems }
             .sortedDescending()
             .take(2)
-            .fold(1) { acc, inspectedItems -> acc * inspectedItems }
+            .fold(1L) { acc, inspectedItems -> acc * inspectedItems }
     }
 
-    fun part2(input: List<Monkey>): Int {
-        return 0
+    fun part2(monkeys: List<Monkey>): Long {
+        val divisor = monkeys.fold(1L) { acc, monkey -> acc * monkey.testNumber }
+        val getBored: (Long) -> Long = { worry -> worry % divisor }
+
+        repeat(10_000) {
+            monkeys.forEach {
+                while(it.hasItems()) {
+                    val (toMonkey, worry) = it.processNextItem(getBored)
+                    monkeys[toMonkey].add(worry)
+                }
+            }
+        }
+
+        return monkeys.map { it.inspectedItems }
+            .sortedDescending()
+            .take(2)
+            .fold(1L) { acc, inspectedItems -> acc * inspectedItems }
     }
 
     fun String.parseInput(): List<Monkey> = split("Monkey ").filter { it.isNotEmpty() }
         .map {
             val lines = it.lines()
 
-            val items = lines[1].substringAfter("Starting items: ").split(", ").map { it.toInt() }
+            val items = lines[1].substringAfter("Starting items: ").split(", ").map { it.toLong() }
 
             val (operationStr, operationNumStr) = lines[2].substringAfter("Operation: new = old ").split(" ")
             val operationNum = operationNumStr.toIntOrNull()
-            val operation: (Int) -> Int =
+            val operation: (Long) -> Long =
                 if (operationNum == null) {
                     if (operationNumStr == "old") { { num -> num * num } } // todo I only have `old * old` in my inputs
                     else error("Unknown operation num $operationNum")
@@ -77,25 +93,25 @@ fun main() {
                     else -> error("Unknown operation $operationStr")
                 }
 
-            val testNumber = lines[3].substringAfter("Test: divisible by ").toInt()
+            val testNumber = lines[3].substringAfter("Test: divisible by ").toLong()
             val testTrueOutcome = lines[4].substringAfter("If true: throw to monkey ").toInt()
             val testFalseOutcome = lines[5].substringAfter("If false: throw to monkey ").toInt()
-            val test: (Int) -> Int = { num -> if (num % testNumber == 0) testTrueOutcome else testFalseOutcome }
+            val test: (Long, Long) -> ToMonkey = { num, testNumber -> if (num % testNumber == 0L) testTrueOutcome else testFalseOutcome }
 
             Monkey(
-                PriorityQueue<Int>(items),
+                PriorityQueue(items),
                 operation,
+                testNumber,
                 test
             )
         }
 
-    val testInput = File("${inputPrefix}_test.txt").reader().readText().parseInput()
+    fun testInput() = File("${inputPrefix}_test.txt").reader().readText().parseInput()
+    fun input() = File("$inputPrefix.txt").reader().readText().parseInput()
 
-    val input = File("$inputPrefix.txt").reader().readText().parseInput()
+    check(part1(testInput()) == 10605L)
+    println(part1(input()))
 
-    check(part1(testInput) == 10605)
-    println(part1(input))
-
-//    check(part2(testInput) == 0)
-//    println(part2(input))
+    check(part2(testInput()) == 2713310158L)
+    println(part2(input()))
 }
