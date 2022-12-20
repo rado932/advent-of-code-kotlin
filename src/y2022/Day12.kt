@@ -40,16 +40,6 @@ object Day12 {
         }
     }
 
-    data class Point2D(val x: Int = 0, val y: Int = 0) {
-        fun cardinalNeighbors(): Set<Point2D> =
-            setOf(
-                copy(x = x - 1),
-                copy(x = x + 1),
-                copy(y = y - 1),
-                copy(y = y + 1),
-            )
-    }
-
     fun List<String>.parseInput(): HeightMap {
         var start: Point2D? = null
         var end: Point2D? = null
