@@ -33,38 +33,16 @@ fun main() {
             return null
         }
 
-        fun dustFall(dust: Point2D): Int {
+        fun dustFall(dust: Point2D, fallUntil: (Point2D) -> Boolean): Int {
             var fallingDust = dust
 
-            while (fallingDust.y < lowestY) {
+            while (fallUntil(fallingDust)) {
                 val downSibling = findUnoccupiedDownSibling(fallingDust)
 
                 if (downSibling != null) {
                     fallingDust = downSibling
                     continue
                 }
-
-                occupiedPoints.add(fallingDust)
-                fallingDust = dust
-            }
-
-            return occupiedPoints.size - rocks
-        }
-
-
-        fun dustFull(dust: Point2D): Int {
-            var fallingDust = dust
-
-            while (true) {
-                val downSibling = findUnoccupiedDownSibling(fallingDust)
-
-                if (downSibling != null) {
-                    fallingDust = downSibling
-                    continue
-                }
-
-                if (occupiedPoints.contains(fallingDust))
-                    break
 
                 occupiedPoints.add(fallingDust)
                 fallingDust = dust
@@ -77,9 +55,13 @@ fun main() {
     fun String.splitToPoint(delimiter: String): Point2D = split(delimiter).let { Point2D(it[0].toInt(), it[1].toInt()) }
     fun Set<Point2D>.toCave() = Cave(this)
 
-    fun part1(cave: Cave): Int = cave.dustFall(Point2D(500, 0))
+    fun part1(cave: Cave): Int = cave.dustFall(Point2D(500, 0)) {
+        it.y < cave.lowestY
+    }
 
-    fun part2(cave: Cave): Int = cave.dustFull(Point2D(500, 0))
+    fun part2(cave: Cave): Int = cave.dustFall(Point2D(500, 0)) {
+        !cave.occupiedPoints.contains(it)
+    }
 
     fun File.parseInput() = readLines().map {
         it.split(" -> ")
