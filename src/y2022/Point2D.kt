@@ -26,24 +26,17 @@ data class Point2D(val x: Int = 0, val y: Int = 0) {
         return sqrt(px * px + py * py)
     }
 
-    // [0,0].allPointsWithSameOrLessDistanceThan([1,1))
-    // [1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1]
-
-    //[9,16].allPointsWithSameOrLessDistanceThan[10,16]
-    //[9,16],[10,16],[9,17],[9,15]
-    fun allPointsWithSameOrLessDistanceThanOld(other: Point2D): Set<Point2D> {
+    fun findCrossSection(other: Point2D, y1: Int): Set<Point2D> {
         val deltaX = abs(x - other.x)
         val deltaY = abs(y - other.y)
+        val maxDeltaY = deltaX + deltaY
+        val deltaY1 = abs(y - y1)
 
-        return (0..deltaX).flatMap { x1 ->
-            (0..deltaY).flatMap { y1 ->
-                listOf(
-                    Point2D(x + x1, y + y1),
-                    Point2D(x + x1, y - y1),
-                    Point2D(x - x1, y + y1),
-                    Point2D(x - x1, y - y1),
-                )
-            }
+        return (0..maxDeltaY - deltaY1).flatMap { i ->
+            listOf(
+                Point2D(x + i, y1),
+                Point2D(x - i, y1),
+            )
         }.toSet()
     }
 

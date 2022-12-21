@@ -7,25 +7,27 @@ private const val inputPrefix = "src/y2022/Day15"
 enum class PointType { SENSOR, BEACON, NOTHING }
 
 fun main() {
-    class Cave(input: List<Pair<Point2D, Point2D>>) {
-        val points = mutableMapOf<Point2D, PointType>()
+    class Cave(private val input: List<Pair<Point2D, Point2D>>) {
+        private val points: Map<Point2D, PointType>
 
         init {
-            input.forEach { (sensor, beacon) ->
-                points[sensor] = PointType.SENSOR
-                points[beacon] = PointType.BEACON
-
-                process(sensor, beacon)
-            }
+            points = input.flatMap { (sensor, beacon) ->
+                listOf(
+                    sensor to PointType.SENSOR,
+                    beacon to PointType.BEACON
+                )
+            }.toMap()
         }
 
-        fun occupiedPositionsOnRow(y: Int) = points.count { (point, type) -> point.y == y && type != PointType.BEACON }
+        fun occupiedPositionsOnRow(y1: Int): Int = input.flatMap { (sensor, beacon) ->
+            sensor.findCrossSection(beacon, y1)
+        }.toSet().count { !points.contains(it) }
 
-        fun process(sensor: Point2D, beacon: Point2D) {
-            sensor.allPointsWithSameOrLessDistanceThan(beacon)
-                .filter { !points.contains(it) }
-                .forEach { points[it] = PointType.NOTHING }
-        }
+//        fun process(sensor: Point2D, beacon: Point2D) {
+//            sensor.allPointsWithSameOrLessDistanceThan(beacon)
+//                .filter { !points.contains(it) }
+//                .forEach { points[it] = PointType.NOTHING }
+//        }
     }
 
     fun part1(cave: Cave, row: Int): Int = cave.occupiedPositionsOnRow(row)
@@ -33,7 +35,7 @@ fun main() {
     fun part2(cave: Cave): Int = 0
 
     fun createPoint(str: String): Point2D {
-        val (x,y) = str.split(", ")
+        val (x, y) = str.split(", ")
         return Point2D(x.substringAfter("x=").toInt(), y.substringAfter("y=").toInt())
     }
 
