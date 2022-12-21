@@ -49,7 +49,7 @@ fun main() {
             return Point2D(x, y).turningFrequency()
         }
 
-        fun occupiedNotBeaconPositionOnRow(y1: Int): Int = findOccupuedPositionsOnRow(y1).count {
+        fun findNotOccupuedPositionsOnRow(y1: Int): Int = findOccupuedPositionsOnRow(y1).count {
             !points.contains(Point2D(it, y1))
         }
 
@@ -60,7 +60,7 @@ fun main() {
             .toSet()
     }
 
-    fun part1(cave: Cave, row: Int): Int = cave.occupiedNotBeaconPositionOnRow(row)
+    fun part1(cave: Cave, row: Int): Int = cave.findNotOccupuedPositionsOnRow(row)
 
     fun part2(cave: Cave, range: IntRange): Long = cave.findTurningFrequency(range)
 
