@@ -23,7 +23,7 @@ fun main() {
             range: IntRange = Int.MIN_VALUE..Int.MAX_VALUE
         ): Boolean {
             return try {
-                input.mapNotNull { (sensor, beacon) ->
+                val lastIndex = input.mapNotNull { (sensor, beacon) ->
                     sensor.findCrossSection(beacon, y1)?.cutByRange(range)
                 }.sortedBy { it.first }
                     .fold(0) { acc, (first, second) ->
@@ -32,7 +32,7 @@ fun main() {
                         else acc
                     }
 
-                true
+                lastIndex == range.last
             } catch (ex: IllegalArgumentException) {
                 false
             }
