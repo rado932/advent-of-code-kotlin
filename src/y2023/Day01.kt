@@ -10,25 +10,43 @@ fun main() {
         return "${numbers.first().value}${numbers.last().value}".toInt()
     }
 
-    fun part1(input: List<String>): Int = input.sumOf {
-        val numbers = "\\d".toRegex().findAll(it)
-        "${numbers.first().value}${numbers.last().value}".toInt()
+    fun String.toNumber(): String = when (this) {
+        "zero" -> "0"
+        "one" -> "1"
+        "two" -> "2"
+        "three" -> "3"
+        "four" -> "4"
+        "five" -> "5"
+        "six" -> "6"
+        "seven" -> "7"
+        "eight" -> "8"
+        "nine" -> "9"
+        else -> this
     }
 
-    fun part2(input: List<String>): Int = input.sumOf {
-        getNumber(
-            it.replace("zero", "zero0zero")
-                .replace("one", "one1one")
-                .replace("two", "two2two")
-                .replace("three", "three3three")
-                .replace("four", "four4four")
-                .replace("five", "five5five")
-                .replace("six", "six6six")
-                .replace("seven", "seven7seven")
-                .replace("eight", "eight8eight")
-                .replace("nine", "nine9nine")
-        )
+    fun getNumber2(string:String): Int {
+        val matches = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "zero")
+        val findFirst = string.findAnyOf(matches)
+        val findLast = string.findLastAnyOf(matches)
+        return "${findFirst?.second?.toNumber()}${findLast?.second?.toNumber()}".toInt()
+    }
 
+    fun part1(input: List<String>): Int = input.sumOf { getNumber(it) }
+
+    fun part2(input: List<String>): Int = input.sumOf {
+        getNumber2(it)
+//        getNumber(
+//            it.replace("zero", "0o")
+//                .replace("one", "o1e")
+//                .replace("two", "t2o")
+//                .replace("three", "t3e")
+//                .replace("four", "4")
+//                .replace("five", "5e")
+//                .replace("six", "6")
+//                .replace("seven", "7n")
+//                .replace("eight", "e8t")
+//                .replace("nine", "n9e")
+//        )
     }
 
     val testInput1 = File("src/y2023/Day01_test.txt").reader().readText()
