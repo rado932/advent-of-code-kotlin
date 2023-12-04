@@ -1,6 +1,6 @@
 import java.io.File
 
-private const val inputPrefix = "src/y2022/DayXX"
+private const val inputPrefix = "src/y2023/DayXX"
 
 fun main() {
 
