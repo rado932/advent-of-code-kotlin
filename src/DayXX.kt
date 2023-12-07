@@ -1,4 +1,5 @@
 import java.io.File
+import Timer.time
 
 private const val inputPrefix = "src/y2023/DayXX"
 
@@ -13,8 +14,8 @@ fun main() {
     val input = File("$inputPrefix.txt").readLines()
 
 //    check(part1(testInput) == 0)
-//    println(part1(input))
+//    time { println(part1(input)) }
 
 //    check(part2(testInput) == 0)
-//    println(part2(input))
+//    time { println(part2(input)) }
 }

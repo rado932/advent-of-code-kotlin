@@ -11,10 +11,10 @@ private class Track(val time: Long, val distance: Long) {
     }
 }
 
-private fun Track.waysToWin(): Int =
+private fun Track.waysToWin(): Long =
     (1 until time).map { raceTime ->
         raceTime * (time - raceTime)
-    }.count { it > distance }
+    }.count { it > distance }.toLong()
 
 private fun Track.waysToWinOptimised(): Long {
     val possibleWaysToWin = time

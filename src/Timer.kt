@@ -15,11 +15,11 @@ object Timer {
         stop(name)
     }
 
-    fun start(name: String) {
+    private fun start(name: String) {
         map[name] = System.currentTimeMillis()
     }
 
-    fun stop(name: String) {
+    private fun stop(name: String) {
         println(
             formatMillisecondsAsSeconds(
                 System.currentTimeMillis() - map[name]!!
