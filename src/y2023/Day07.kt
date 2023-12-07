@@ -14,7 +14,7 @@ private class Hand(val cards: String, val score: Int) {
 
 private fun Hand.isStronger(other: Hand, p2: Boolean = false): Int {
     val thisPower = if (p2) powerP2 else powerP1
-    val otherPower =if (p2) other.powerP2 else other.powerP1
+    val otherPower = if (p2) other.powerP2 else other.powerP1
     if (thisPower > otherPower) return 1
     else if (thisPower < otherPower) return -1
 
@@ -29,8 +29,7 @@ private fun Hand.isStronger(other: Hand, p2: Boolean = false): Int {
 
 private fun Char.isStronger(other: Char, p2: Boolean = false): Int? {
     if (this == other) return null
-    return if (power(p2) > other.power(p2)) 1
-    else -1
+    return power(p2) - other.power(p2)
 }
 
 /*
@@ -43,26 +42,19 @@ private fun Char.isStronger(other: Char, p2: Boolean = false): Int? {
 0 High card         12345   1x5
  */
 private fun Hand.power(p2: Boolean = false): Int {
-    val mapOfCards = if (p2) {
-        cards.groupBy { it }
-            .toMutableMap()
-            .apply {
-                if (containsKey('J')) {
-                    val js = this['J']!!
-                    val copy = this.filter { (key, _) -> key != 'J' }
-                    if (copy.isNotEmpty()) {
-                        val biggestEntry = copy.maxByOrNull { it.value.size }!!
-                        set(biggestEntry.key, biggestEntry.value + js)
-                        remove('J')
+    val mapOfCards = cards.groupBy { it }.let { map ->
+        if (p2) {
+            map.toMutableMap()
+                .apply {
+                    remove('J')?.let { js ->
+                        val (key, value) = maxByOrNull { it.value.size } ?: mapOf('J' to js).entries.first()
+                        set(key, value + js)
                     }
                 }
-            }
-    } else {
-        cards.groupBy { it }
+        } else map
     }.map { it.value.size }
         .groupBy { it }
         .mapValues { it.value.size }
-        .toSortedMap(comparator = Comparator.reverseOrder()) // todo this is not needed
 
     return when {
         mapOfCards.containsKey(5) -> 6      // Five of a kind
