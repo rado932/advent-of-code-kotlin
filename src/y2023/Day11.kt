@@ -7,16 +7,15 @@ private const val inputPrefix = "src/y2023/Day11"
 
 private data class Point(val x: Int = 0, val y: Int = 0)
 
-private class Space(val points: List<Point>) {
-    val yStars: Set<Int> by lazy { points.map { it.y }.toSet() }
-
-    val xStars: Set<Int> by lazy { points.map { it.x }.toSet() }
+private class Space(private val stars: List<Point>) {
+    val xOccupied: Set<Int> by lazy { stars.map { it.x }.toSet() }
+    val yOccupied: Set<Int> by lazy { stars.map { it.y }.toSet() }
 
     val starPairs: List<Pair<Point, Point>> by lazy {
         mutableListOf<Pair<Point, Point>>().apply {
-            for (i in 0 until points.size - 1) {
-                for (j in i + 1 until points.size) {
-                    add(points[i] to points[j])
+            for (i in 0 until stars.size - 1) {
+                for (j in i + 1 until stars.size) {
+                    add(stars[i] to stars[j])
                 }
             }
         }
@@ -26,17 +25,14 @@ private class Space(val points: List<Point>) {
         val xRange = if (a.x > b.x) b.x..a.x else a.x..b.x
         val yRange = if (a.y > b.y) b.y..a.y else a.y..b.y
 
-        val xExpanded = with (xRange.filterNot { xStars.contains(it) }.size) {
-            if (this == 0) 0
-            else this * (galaxyExpansionRate - 1)
-        }.toLong()
+        val xSpace = xRange.last - xRange.first
+        val ySpace = yRange.last - yRange.first
 
-        val yExpanded = with (yRange.filterNot { yStars.contains(it) }.size) {
-            if (this == 0) 0
-            else this * (galaxyExpansionRate - 1)
-        }.toLong()
+        val emptyRowMultiplier = (galaxyExpansionRate - 1).toLong()
+        val xExpandedEmptyRows = xRange.filterNot { xOccupied.contains(it) }.size * emptyRowMultiplier
+        val yExpandedEmptyRows = yRange.filterNot { yOccupied.contains(it) }.size * emptyRowMultiplier
 
-        return (xRange.last - xRange.first) + (yRange.last - yRange.first) + xExpanded + yExpanded
+        return xSpace + ySpace + xExpandedEmptyRows + yExpandedEmptyRows
     }
 }
 
