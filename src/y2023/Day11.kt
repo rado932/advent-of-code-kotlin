@@ -8,8 +8,14 @@ private const val inputPrefix = "src/y2023/Day11"
 private data class Point(val x: Int = 0, val y: Int = 0)
 
 private class Space(private val stars: List<Point>) {
-    val xOccupied: Set<Int> by lazy { stars.map { it.x }.toSet() }
-    val yOccupied: Set<Int> by lazy { stars.map { it.y }.toSet() }
+    val occupied: Pair<Set<Int>, Set<Int>> by lazy {
+        val x = mutableSetOf<Int>()
+        val y = mutableSetOf<Int>()
+        stars.forEach { x.add(it.x); y.add(it.y) }
+        x to y
+    }
+    val xOccupied = occupied.first
+    val yOccupied = occupied.second
 
     val starPairs: List<Pair<Point, Point>> by lazy {
         mutableListOf<Pair<Point, Point>>().apply {
@@ -29,17 +35,18 @@ private class Space(private val stars: List<Point>) {
         val ySpace = yRange.last - yRange.first
 
         val emptyRowMultiplier = (galaxyExpansionRate - 1).toLong()
-        val xExpandedEmptyRows = xRange.filterNot { xOccupied.contains(it) }.size * emptyRowMultiplier
-        val yExpandedEmptyRows = yRange.filterNot { yOccupied.contains(it) }.size * emptyRowMultiplier
+        val xExpandedEmptyRows = xRange.count { !xOccupied.contains(it) }
+        val yExpandedEmptyRows = yRange.count { !yOccupied.contains(it) }
 
-        return xSpace + ySpace + xExpandedEmptyRows + yExpandedEmptyRows
+        return xSpace + ySpace + ((xExpandedEmptyRows + yExpandedEmptyRows) * emptyRowMultiplier)
     }
 }
 
 private fun List<String>.toSpace(): Space = Space(
     this.flatMapIndexed { index, line ->
-        line.indices.filter { line[it] == '#' }.map {
-            Point(index, it)
+        line.indices.mapNotNull {
+            if (line[it] == '#') Point(index, it)
+            else null
         }
     }
 )
