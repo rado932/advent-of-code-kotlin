@@ -16,28 +16,21 @@ private class MirrorMap(val mirrorMap: List<String>) {
         }
     }
 
-    // Each list entry is the first row of a mirror pair
-    fun findMirrorRows(): List<Int> {
-        return rows.windowed(2).mapIndexedNotNull { index, (a, b) ->
-            if (a.contentEquals(b)) index
-            else null
-        }
-    }
+    fun findMirrorRows(): List<Int> = findMirrors(rows)
+    fun findMirrorColumns(): List<Int> = findMirrors(columns)
 
     // Each list entry is the first column of a mirror pair
-    fun findMirrorColumns(): List<Int> {
-        return columns.windowed(2).mapIndexedNotNull { index, (a, b) ->
+    private fun findMirrors(charArrs: List<CharArray>): List<Int> =
+        charArrs.windowed(2).mapIndexedNotNull { index, (a, b) ->
             if (a.contentEquals(b)) index
             else null
         }
-    }
 
     fun rowIsMirrorPatternStart(row: Int): Boolean = isMirrorPatternStart(rows, row)
-
     fun columnIsMirrorPatternStart(column: Int): Boolean = isMirrorPatternStart(columns, column)
 
     // assuming row and row+1 are mirrors
-    fun isMirrorPatternStart(charArrs: List<CharArray>, index: Int): Boolean {
+    private fun isMirrorPatternStart(charArrs: List<CharArray>, index: Int): Boolean {
         var leftRow = index - 1
         var rightRow = index + 2
 
