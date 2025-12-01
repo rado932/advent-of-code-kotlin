@@ -13,9 +13,11 @@ fun main() {
 
     val input = File("$inputPrefix.txt").readLines()
 
-//    check(part1(testInput) == 0)
+//    val testAnswerPart1 = part1(testInput)
+//    check(testAnswerPart1 == 0, { "part 1 failed: $testAnswerPart1" })
 //    time { println(part1(input)) }
-
-//    check(part2(testInput) == 0)
+//
+//    val testAnswerPart2 = part2(testInput)
+//    check(testAnswerPart2 == 0, { "part 2 failed: $testAnswerPart2" })
 //    time { println(part2(input)) }
 }
