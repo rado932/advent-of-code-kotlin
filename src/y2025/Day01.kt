@@ -3,20 +3,20 @@ import Timer.time
 import kotlin.math.abs
 
 private const val inputPrefix = "src/y2025/Day01"
+private const val startPos = 50
+private const val maxPos = 100
+private const val triggerPos = 0
+private fun String.toDelta() = replace("R", "+").replace("L", "-").toInt()
 
 fun main() {
-
-    val startPos = 50
-
     fun part1(input: List<String>): Int {
         var pos = startPos
         var passOnZero = 0
 
         input.forEach {
-            val delta = it.replace("R", "+").replace("L", "-").toInt()
-            val cur = pos + delta
-            pos = cur.mod(100)
-            if (pos == 0) passOnZero++
+            val cur = pos + it.toDelta()
+            pos = cur.mod(maxPos)
+            if (pos == triggerPos) passOnZero++
         }
 
         return passOnZero
@@ -26,8 +26,8 @@ fun main() {
         var pos = startPos
         return input.map {
             val cur = pos + it.toDelta()
-            pos = cur.mod(100)
-            if (pos == 0) 1 else 0
+            pos = cur.mod(maxPos)
+            if (pos == triggerPos) 1 else 0
         }.sum()
     }
 
@@ -36,13 +36,12 @@ fun main() {
         var passOnZero = 0
 
         input.forEach {
-            val delta = it.replace("R", "+").replace("L", "-").toInt()
-            val cur = pos + delta
+            val cur = pos + it.toDelta()
 
-            if (pos != 0 && cur <= 0) passOnZero++
-            passOnZero += abs(cur) / 100
+            if (pos != triggerPos && cur <= 0) passOnZero++
+            passOnZero += abs(cur) / maxPos
 
-            pos = cur.mod(100)
+            pos = cur.mod(maxPos)
         }
 
         return passOnZero
@@ -52,8 +51,8 @@ fun main() {
         var pos = startPos
         return input.sumOf {
             val cur = pos + it.toDelta()
-            ((abs(cur) / 100) + (if (pos != 0 && cur <= 0) 1 else 0)).also {
-                pos = cur.mod(100)
+            ((abs(cur) / maxPos) + (if (pos != triggerPos && cur <= 0) 1 else 0)).also {
+                pos = cur.mod(maxPos)
             }
         }
     }
@@ -70,5 +69,3 @@ fun main() {
     check(testAnswerPart2 == 6, { "part 2 failed: $testAnswerPart2" })
     time { println(part2Map(input)) } // 6932
 }
-
-private fun String.toDelta() = replace("R", "+").replace("L", "-").toInt()
