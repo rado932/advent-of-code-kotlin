@@ -68,7 +68,7 @@ fun main() {
 
     val input = File("$inputPrefix.txt").readLines()
 
-    //4.940584ms
+    // initial 4.940584ms | part2-str + shortC 1.857083ms
     val testAnswerPart1 = part1(testInput)
     check(testAnswerPart1 == 357, { "part 1 failed: $testAnswerPart1" })
     time { println(part1(input)) } // 17155
