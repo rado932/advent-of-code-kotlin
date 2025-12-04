@@ -52,7 +52,7 @@ fun main() {
             (neighbours < 4).also { if (it) nextPointToCheck.remove(point) }
         }
 
-    fun part2(input: MutableList<MutableList<Char>>): Int {
+    fun part2(input: List<List<Char>>): Int {
         val nextPointToCheck: MutableSet<Point2D> = input.flatMapIndexed { y, row ->
             row.mapIndexedNotNull { x, char -> if (char == '@') Point2D(x, y) else null }
         }.toMutableSet()
