@@ -29,38 +29,39 @@ fun main() {
         }.sum()
     }.sum()
 
-    fun lessThanFourNeighboursWithSideEffect(x: Int,
-                                             y: Int,
-                                             input: MutableList<MutableList<Char>>,
-                                             validChars: List<Char>): Boolean {
-        val coordinatesToCheck = getCoordinatesToCheck(x, y)
+    data class Point2D(val x: Int, val y: Int)
 
-        val neighbourCount = coordinatesToCheck.count { (x, y) ->
-            (input.getOrNull(y)?.getOrNull(x) in validChars)
-        }
-        return (neighbourCount < 4).also {
-            if (it) input[y][x] = validChars[0]
-        }
+    fun getCoordinatesToCheck(point: Point2D): List<Point2D> {
+        val (x, y) = point
+        return listOf(
+            Point2D(x - 1, y + 1),
+            Point2D(x - 1, y - 1),
+            Point2D(x - 1, y),
+            Point2D(x, y - 1),
+            Point2D(x, y + 1),
+            Point2D(x + 1, y - 1),
+            Point2D(x + 1, y),
+            Point2D(x + 1, y + 1)
+        )
     }
 
-    // todo store ranges of all '@'s instead and go over those only
-    fun solutionPart1(input: MutableList<MutableList<Char>>, validChars: List<Char>): Int = input.mapIndexed { y, row ->
-        row.mapIndexed { x, char ->
-            if (char !in validChars) 0
-            else if (lessThanFourNeighboursWithSideEffect(x, y, input, validChars)) 1
-            else 0
-        }.sum()
-    }.sum()
+    fun solutionPart1(pointsToCheck: Set<Point2D>, nextPointToCheck: MutableSet<Point2D>): Int =
+        pointsToCheck.count { point ->
+            val possibleNeighbours = getCoordinatesToCheck(point)
+            val neighbours = possibleNeighbours.count { it in pointsToCheck }
+            (neighbours < 4).also { if (it) nextPointToCheck.remove(point) }
+        }
 
     fun part2(input: MutableList<MutableList<Char>>): Int {
-        var specialChar = '@'
-        var validChars: List<Char>
+        val nextPointToCheck: MutableSet<Point2D> = input.flatMapIndexed { y, row ->
+            row.mapIndexedNotNull { x, char -> if (char == '@') Point2D(x, y) else null }
+        }.toMutableSet()
+
+        var pointsToCheck: Set<Point2D>
 
         return generateSequence {
-            specialChar = Char(specialChar.code + 1)
-            validChars = listOf(specialChar, '@')
-
-            solutionPart1(input, validChars)
+            pointsToCheck = nextPointToCheck.toSet()
+            solutionPart1(pointsToCheck, nextPointToCheck)
         }.takeWhile { it != 0 }.sum()
     }
 
