@@ -3,65 +3,77 @@ import java.io.File
 
 private const val inputPrefix = "src/y2025/Day04"
 
+private val NEIGHBOUR_OFFSETS = arrayOf(
+    -1 to -1, -1 to 0, -1 to 1,
+    0 to -1, 0 to 1,
+    1 to -1, 1 to 0, 1 to 1
+)
+
 fun main() {
-
-    fun getCoordinatesToCheck(x: Int, y: Int): List<Pair<Int, Int>> = listOf(
-        x - 1 to y - 1,
-        x - 1 to y,
-        x - 1 to y + 1,
-        x to y - 1,
-        x to y + 1,
-        x + 1 to y - 1,
-        x + 1 to y,
-        x + 1 to y + 1
-    )
-
-    fun lessThanFourNeighbours(x: Int, y: Int, input: List<List<Char>>): Boolean {
-        val coordinatesToCheck = getCoordinatesToCheck(x, y)
-        return coordinatesToCheck.count { (x, y) -> input.getOrNull(y)?.getOrNull(x) == '@' } < 4
-    }
-
-    fun part1(input: List<List<Char>>): Int = input.mapIndexed { y, row ->
-        row.mapIndexed { x, char ->
-            if (char != '@') 0
-            else if (lessThanFourNeighbours(x, y, input)) 1
-            else 0
-        }.sum()
-    }.sum()
-
-    data class Point2D(val x: Int, val y: Int)
-
-    fun getCoordinatesToCheck(point: Point2D): List<Point2D> {
-        val (x, y) = point
-        return listOf(
-            Point2D(x - 1, y + 1),
-            Point2D(x - 1, y - 1),
-            Point2D(x - 1, y),
-            Point2D(x, y - 1),
-            Point2D(x, y + 1),
-            Point2D(x + 1, y - 1),
-            Point2D(x + 1, y),
-            Point2D(x + 1, y + 1)
-        )
-    }
-
-    fun countRollsToBeRemoved(pointsToCheck: Set<Point2D>, nextPointToCheck: MutableSet<Point2D>): Int =
-        pointsToCheck.count { point ->
-            val possibleNeighbours = getCoordinatesToCheck(point)
-            val neighbours = possibleNeighbours.count { it in pointsToCheck }
-            (neighbours < 4).also { if (it) nextPointToCheck.remove(point) }
+    fun hasLessThanFourNeighbours(x: Int,
+                                  y: Int,
+                                  height: Int,
+                                  width: Int,
+                                  input: List<List<Char>>): Boolean {
+        var neighbours = 0
+        for ((dx, dy) in NEIGHBOUR_OFFSETS) {
+            val nx = x + dx
+            val ny = y + dy
+            if (ny in 0 until height && nx in 0 until width && input[ny][nx] == '@') {
+                neighbours++
+                if (neighbours >= 4) return false
+            }
         }
+        return true
+    }
+
+    fun part1(input: List<List<Char>>): Int {
+        val height = input.size
+        val width = input[0].size
+        return input.flatMapIndexed { y, row ->
+            row.filterIndexed { x, char -> char == '@' && hasLessThanFourNeighbours(x, y, height, width, input) }
+        }.size
+    }
+
+    fun hasLessThanFourNeighbours(x: Int,
+                                  y: Int,
+                                  height: Int,
+                                  width: Int,
+                                  grid: Array<BooleanArray>): Boolean {
+        var neighbours = 0
+        for ((dx, dy) in NEIGHBOUR_OFFSETS) {
+            val nx = x + dx
+            val ny = y + dy
+            if (ny in 0 until height && nx in 0 until width && grid[ny][nx]) {
+                neighbours++
+                if (neighbours >= 4) return false
+            }
+        }
+        return true
+    }
 
     fun part2(input: List<List<Char>>): Int {
-        val nextPointToCheck: MutableSet<Point2D> = input.flatMapIndexed { y, row ->
-            row.mapIndexedNotNull { x, char -> if (char == '@') Point2D(x, y) else null }
+        val grid = Array(input.size) { BooleanArray(input[0].size) }
+        val height = grid.size
+        val width = grid[0].size
+
+        val nextPointToCheck: MutableSet<Pair<Int, Int>> = input.flatMapIndexed { y, row ->
+            row.mapIndexedNotNull { x, char ->
+                if (char == '@') {
+                    grid[y][x] = true
+                    x to y
+                } else null
+            }
         }.toMutableSet()
 
-        var pointsToCheck: Set<Point2D>
-
         return generateSequence {
-            pointsToCheck = nextPointToCheck.toSet()
-            countRollsToBeRemoved(pointsToCheck, nextPointToCheck)
+            val pointsToRemove = nextPointToCheck.filterTo(HashSet()) { (x, y) ->
+                hasLessThanFourNeighbours(x, y, height, width, grid)
+            }
+
+            nextPointToCheck -= pointsToRemove
+            pointsToRemove.forEach { (x, y) -> grid[y][x] = false }
+            pointsToRemove.size
         }.takeWhile { it != 0 }.sum()
     }
 
@@ -69,12 +81,12 @@ fun main() {
 
     val input = File("$inputPrefix.txt").readLines().map { it.toMutableList() }.toMutableList()
 
-    // initial 6.739958ms
+    // initial 6.739958ms | optimised 3.180375ms
     val testAnswerPart1 = part1(testInput)
     check(testAnswerPart1 == 13, { "part 1 failed: $testAnswerPart1" })
     time { println(part1(input)) } // 1493
 
-    // initial 47.960584ms
+    // initial 47.960584ms | using grid 19.169541ms
     val testAnswerPart2 = part2(testInput)
     check(testAnswerPart2 == 43, { "part 2 failed: $testAnswerPart2" })
     time { println(part2(input)) } // 9194
