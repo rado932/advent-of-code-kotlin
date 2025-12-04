@@ -14,31 +14,6 @@ fun main() {
                                   y: Int,
                                   height: Int,
                                   width: Int,
-                                  input: List<List<Char>>): Boolean {
-        var neighbours = 0
-        for ((dx, dy) in NEIGHBOUR_OFFSETS) {
-            val nx = x + dx
-            val ny = y + dy
-            if (ny in 0 until height && nx in 0 until width && input[ny][nx] == '@') {
-                neighbours++
-                if (neighbours >= 4) return false
-            }
-        }
-        return true
-    }
-
-    fun part1(input: List<List<Char>>): Int {
-        val height = input.size
-        val width = input[0].size
-        return input.flatMapIndexed { y, row ->
-            row.filterIndexed { x, char -> char == '@' && hasLessThanFourNeighbours(x, y, height, width, input) }
-        }.size
-    }
-
-    fun hasLessThanFourNeighbours(x: Int,
-                                  y: Int,
-                                  height: Int,
-                                  width: Int,
                                   grid: Array<BooleanArray>): Boolean {
         var neighbours = 0
         for ((dx, dy) in NEIGHBOUR_OFFSETS) {
@@ -52,10 +27,27 @@ fun main() {
         return true
     }
 
+    fun part1(input: List<List<Char>>): Int {
+        val height = input.size
+        val width = input[0].size
+        val grid = Array(height) { BooleanArray(width) }
+
+        // adds a few extra ms but can re-use the same hasLessThanFourNeighbours method :)
+        input.forEachIndexed { y, row ->
+            row.forEachIndexed { x, char ->
+                if (char == '@') grid[y][x] = true
+            }
+        }
+
+        return grid.flatMapIndexed { y, row ->
+            row.filterIndexed { x, isChar -> isChar && hasLessThanFourNeighbours(x, y, height, width, grid) }
+        }.size
+    }
+
     fun part2(input: List<List<Char>>): Int {
-        val grid = Array(input.size) { BooleanArray(input[0].size) }
-        val height = grid.size
-        val width = grid[0].size
+        val height = input.size
+        val width = input[0].size
+        val grid = Array(height) { BooleanArray(width) }
 
         val nextPointToCheck: MutableSet<Pair<Int, Int>> = input.flatMapIndexed { y, row ->
             row.mapIndexedNotNull { x, char ->
