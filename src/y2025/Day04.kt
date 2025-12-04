@@ -45,7 +45,7 @@ fun main() {
         )
     }
 
-    fun solutionPart1(pointsToCheck: Set<Point2D>, nextPointToCheck: MutableSet<Point2D>): Int =
+    fun countRollsToBeRemoved(pointsToCheck: Set<Point2D>, nextPointToCheck: MutableSet<Point2D>): Int =
         pointsToCheck.count { point ->
             val possibleNeighbours = getCoordinatesToCheck(point)
             val neighbours = possibleNeighbours.count { it in pointsToCheck }
@@ -61,7 +61,7 @@ fun main() {
 
         return generateSequence {
             pointsToCheck = nextPointToCheck.toSet()
-            solutionPart1(pointsToCheck, nextPointToCheck)
+            countRollsToBeRemoved(pointsToCheck, nextPointToCheck)
         }.takeWhile { it != 0 }.sum()
     }
 
