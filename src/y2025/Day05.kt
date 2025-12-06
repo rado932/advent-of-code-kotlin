@@ -3,12 +3,6 @@ import java.io.File
 
 private const val inputPrefix = "src/y2025/Day05"
 
-private val NEIGHBOUR_OFFSETS = arrayOf(
-    -1 to -1, -1 to 0, -1 to 1,
-    0 to -1, 0 to 1,
-    1 to -1, 1 to 0, 1 to 1
-)
-
 fun main() {
 
     fun splitInput(input: List<String>): Pair<List<LongRange>, List<Long>> {
