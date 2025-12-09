@@ -128,8 +128,8 @@ fun main() {
     check(testAnswerPart1 == 50L, { "part 1 failed: $testAnswerPart1" })
     time { println(part1(input)) } // 4790063600
 
-    // 35m 38.793498750s
-    val testAnswerPart2 = part2(testInput)
-    check(testAnswerPart2 == 24L, { "part 2 failed: $testAnswerPart2" })
-    time { println(part2(input)) } // 1516172795
+//    // 35m 38.793498750s
+//    val testAnswerPart2 = part2(testInput)
+//    check(testAnswerPart2 == 24L, { "part 2 failed: $testAnswerPart2" })
+//    time { println(part2(input)) } // 1516172795
 }
