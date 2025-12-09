@@ -31,37 +31,6 @@ fun main() {
         Line(minOf(a.x, b.x)..maxOf(a.x, b.x), minOf(a.y, b.y)..maxOf(a.y, b.y))
     }
 
-    // todo was possibly not needed?
-    fun isPointOnSegment(p: Point, line: Line): Boolean = p.x in line.x && p.y in line.y
-
-    // todo was possibly not needed?
-    fun isInside(point: Point, lines: List<Line>, verticals: List<Line>): Boolean {
-        if (lines.any { isPointOnSegment(point, it) }) return true
-
-        // Ray-casting: count intersections with vertical edges to the right
-        var crossings = 0
-        for (line in verticals) {
-            // Only vertical segments matter for a horizontal ray
-            // The ray direction is on the left of the point
-            if (point.x >= line.x.first()) continue
-
-            // Half-open [y1, y2) to avoid double-counting vertices
-            if (point.y in line.y && point.y != line.y.last) crossings++
-        }
-        return crossings % 2 == 1
-    }
-
-    // todo was possibly not needed?
-    fun cornersAreValid(p1: Point, p2: Point, lines: List<Line>, verticals: List<Line>): Boolean {
-        val (x1, y1) = p1
-        val (x2, y2) = p2
-
-        val p3 = Point(x1, y2)
-        val p4 = Point(x2, y1)
-
-        return isInside(p3, lines, verticals) && isInside(p4, lines, verticals)
-    }
-
     fun edgesAreValid(p1: Point, p2: Point, lines: List<Line>): Boolean {
         val (xRange, yRange) = getOutline(p1, p2)
 
@@ -82,11 +51,6 @@ fun main() {
         return true
     }
 
-    fun rectangleIsValid(p1: Point, p2: Point, lines: List<Line>, verticals: List<Line>): Boolean =
-        cornersAreValid(p1, p2, lines, verticals) &&
-            edgesAreValid(p1, p2, lines)
-
-
     fun part2(input: List<String>): Long {
         val points = input.map {
             val (x, y) = it.split(",")
@@ -94,7 +58,6 @@ fun main() {
         }
 
         val lines = toLines(points)
-        val verticals = lines.filter { it.isVertical }
 
         var maxArea = 0L
         for (i in points.indices) {
@@ -102,7 +65,7 @@ fun main() {
             for (j in i + 1 until points.size) {
                 val p2 = points[j]
                 val area = calculateVolume2D(p1, p2)
-                if (area > maxArea && rectangleIsValid(p1, p2, lines, verticals)) maxArea = area
+                if (area > maxArea && edgesAreValid(p1, p2, lines)) maxArea = area
             }
         }
         return maxArea
@@ -111,7 +74,7 @@ fun main() {
     val testInput = File("${inputPrefix}_test.txt").readLines()
     val input = File("$inputPrefix.txt").readLines()
 
-    // 133.852917ms
+    // 101.908542ms | 23.696166ms
     val testAnswerPart2 = part2(testInput)
     check(testAnswerPart2 == 24L) { "part 2 failed: $testAnswerPart2" }
     time { println(part2(input)) } // 1516172795
