@@ -31,20 +31,22 @@ fun main() {
         Line(minOf(a.x, b.x)..maxOf(a.x, b.x), minOf(a.y, b.y)..maxOf(a.y, b.y))
     }
 
+    fun IntRange.overlaps(other: IntRange): Boolean {
+        val maxFirst = maxOf(this.first, other.first)
+        val minLast = minOf(this.last, other.last)
+        return maxFirst < minLast
+    }
+
     fun edgesAreValid(p1: Point, p2: Point, lines: List<Line>): Boolean {
         val (xRange, yRange) = getOutline(p1, p2)
 
         for (line in lines) {
             if (line.isVertical) {
                 if (line.x.first !in (xRange.first + 1)..<xRange.last) continue
-                val interLow = maxOf(line.y.first, yRange.first)
-                val interHigh = minOf(line.y.last, yRange.last)
-                if (interLow < interHigh) return false
+                if (line.y.overlaps(yRange)) return false
             } else if (line.isHorizontal) {
                 if (line.y.first !in (yRange.first + 1)..<yRange.last) continue
-                val interLow = maxOf(line.x.first, xRange.first)
-                val interHigh = minOf(line.x.last, xRange.last)
-                if (interLow < interHigh) return false
+                if (line.x.overlaps(xRange)) return false
             }
         }
 
